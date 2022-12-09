@@ -39,7 +39,8 @@ Imports:
     vctrs,
     progress,
     memoise,
-    utils
+    utils,
+    R.utils
 Suggests:
     knitr,
     testthat (>= 3.0.0),

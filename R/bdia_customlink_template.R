@@ -31,16 +31,16 @@
 #' @export
 bdia_customlink_template <- function(linkParam = 'name', idParam = 'mcid', cidType = NULL) {
   #vars
-  link <- case_when(linkParam == 'url' ~ 'linkURL',
+  link <- dplyr::case_when(linkParam == 'url' ~ 'linkURL',
                     linkParam == 'qstring' ~ 'queryString',
                     linkParam == 'name' ~ 'linkName')
 
-  id <- case_when(idParam == 'vid' ~ 'visitorID',
+  id <- dplyr::case_when(idParam == 'vid' ~ 'visitorID',
                   idParam == 'ip' ~ 'IPAddress',
                   idParam == 'cid' ~ paste0('customerID.',cidType,'.id'),
                   idParam == 'mcid' ~ 'marketingCloudVisitorID')
 
-  nc <- case_when(idParam == 'cid' && linkParam != 'qstring' ~ 7,
+  nc <- dplyr::case_when(idParam == 'cid' && linkParam != 'qstring' ~ 7,
                   idParam != 'cid' && linkParam == 'qstring' ~ 5,
                   TRUE ~ 6)
 

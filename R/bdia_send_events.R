@@ -15,11 +15,11 @@
 #'
 #' @seealso [bdia_validate_file()]
 #' @family bdia
-#' @import dplyr httr R.utils
+#' @import dplyr httr
 #' @export
 bdia_send_events <- function(file, routing='g') {
   #vars
-  e_url <- case_when(routing == 'n' ~ 'https://analytics-collection-va7.adobe.io', #NA
+  e_url <- dplyr::case_when(routing == 'n' ~ 'https://analytics-collection-va7.adobe.io', #NA
                      routing == 'e' ~ 'https://analytics-collection-nld2.adobe.io', #EU/Asia
                      TRUE ~ 'https://analytics-collection.adobe.io') #Global
 

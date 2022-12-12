@@ -31,11 +31,11 @@
 #' @export
 bdia_pageview_template <- function(pageParam = 'name', idParam = 'mcid', cidType = NULL) {
   #vars
-  page <- case_when(pageParam == 'url' ~ 'pageURL',
+  page <- dplyr::case_when(pageParam == 'url' ~ 'pageURL',
                     pageParam == 'qstring' ~ 'queryString',
                     pageParam == 'name' ~ 'pageName')
 
-  id <- case_when(idParam == 'vid' ~ 'visitorID',
+  id <- dplyr::case_when(idParam == 'vid' ~ 'visitorID',
                   idParam == 'ip' ~ 'IPAddress',
                   idParam == 'cid' ~ paste0('customerID.',cidType,'.id'),
                   idParam == 'mcid' ~ 'marketingCloudVisitorID')

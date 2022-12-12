@@ -16,11 +16,11 @@
 #'
 #' @seealso [bdia_pageview_template(), bdia_customlink_template(), bdia_df2gz()]
 #' @family bdia
-#' @import httr R.utils dplyr
+#' @import httr dplyr
 #' @export
 bdia_validate_file <- function(file, routing = 'g') {
   #Define the data routing domain
-  e_url <- case_when(routing == 'n' ~ 'https://analytics-collection-va7.adobe.io', #NAM
+  e_url <- dplyr::case_when(routing == 'n' ~ 'https://analytics-collection-va7.adobe.io', #NAM
                      routing == 'e' ~ 'https://analytics-collection-nld2.adobe.io', #EU/Asia
                      routing == 'g' ~ 'https://analytics-collection.adobe.io') #Global
 

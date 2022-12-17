@@ -18,6 +18,9 @@
 #' @import dplyr httr
 #' @export
 bdia_send_events <- function(file, routing='g') {
+  token_config <- get_token_config(client_id = env_vars$client_id,
+                                   client_secret = env_vars$client_secret)
+
   #vars
   e_url <- dplyr::case_when(routing == 'n' ~ 'https://analytics-collection-va7.adobe.io', #NA
                      routing == 'e' ~ 'https://analytics-collection-nld2.adobe.io', #EU/Asia
@@ -32,7 +35,7 @@ bdia_send_events <- function(file, routing='g') {
     req <- httr::POST(
       url = paste0(e_url, '/aa/collect/v1/events'),
       body = list(file = httr::upload_file(file)),
-      httr::add_headers('Authorization'=paste("Bearer", content(token$token)$access_token),
+      httr::add_headers('Authorization'=token_config,
                         'x-api-key'=env_vars$client_secret)
     )
 

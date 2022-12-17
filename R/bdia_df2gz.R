@@ -13,7 +13,7 @@
 #'
 #' @seealso [bdia_pageview_template(), bdia_customlink_template()]
 #' @family bdia
-#' @import R.utils
+#' @import R.utils utils
 #' @export
 bdia_df2gz <- function(x, fileName, path='') {
   #append csv file extension to fileName and set path
@@ -21,6 +21,6 @@ bdia_df2gz <- function(x, fileName, path='') {
   path <- paste(getwd(), path, fileName, sep = '/')
 
   #write to csv and zip
-  write.csv(x, file = path, row.names = FALSE)
-  gzip(path)
+  utils::write.csv(x, file = path, row.names = FALSE)
+  R.utils::gzip(path)
 }

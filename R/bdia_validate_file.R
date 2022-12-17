@@ -30,12 +30,13 @@ bdia_validate_file <- function(file, routing = 'g') {
                      routing == 'g' ~ 'https://analytics-collection.adobe.io') #Global
 
   #Send the POST request to the validation endpoint
+  #Ask Ben about best practice for getting API key...
   req <- httr::POST(
     config = NULL,
     url = paste0(e_url, '/aa/collect/v1/events/validate'),
     body = list(file = httr::upload_file(file)),
     token_config,
-    httr::add_headers('x-api-key'=env_vars$client_secret)
+    httr::add_headers('x-api-key'=Sys.getenv("AW_API_KEY"))
   )
 
   #Save the response into a var

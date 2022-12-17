@@ -34,8 +34,8 @@ bdia_validate_file <- function(file, routing = 'g') {
     config = NULL,
     url = paste0(e_url, '/aa/collect/v1/events/validate'),
     body = list(file = httr::upload_file(file)),
-    httr::add_headers('Authorization'=token_config,
-                      'x-api-key'=env_vars$client_secret)
+    token_config,
+    httr::add_headers('x-api-key'=env_vars$client_secret)
   )
 
   #Save the response into a var

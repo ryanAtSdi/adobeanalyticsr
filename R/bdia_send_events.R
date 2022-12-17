@@ -18,6 +18,7 @@
 #' @import dplyr httr
 #' @export
 bdia_send_events <- function(file, routing='g') {
+  env_vars <- get_env_vars()
   token_config <- get_token_config(client_id = env_vars$client_id,
                                    client_secret = env_vars$client_secret)
 

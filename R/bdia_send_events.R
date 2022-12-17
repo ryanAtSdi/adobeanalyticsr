@@ -31,13 +31,15 @@ bdia_send_events <- function(file, routing='g') {
   valid <- bdia_validate(file, routing)
 
   #post, but only if file was validated
+  #Ask Ben about best practice for getting API key...
   if (str_detect(valid, 'file is valid')) {
     #request
     req <- httr::POST(
+      config = NULL,
       url = paste0(e_url, '/aa/collect/v1/events'),
       body = list(file = httr::upload_file(file)),
-      httr::add_headers('Authorization'=token_config,
-                        'x-api-key'=env_vars$client_secret)
+      token_config,
+      httr::add_headers('x-api-key'=Sys.getenv("AW_API_KEY"))
     )
 
     #response

@@ -30,6 +30,7 @@ bdia_validate_file <- function(file, routing = 'g') {
 
   #Send the POST request to the validation endpoint
   req <- httr::POST(
+    config = NULL,
     url = paste0(e_url, '/aa/collect/v1/events/validate'),
     body = list(file = httr::upload_file(file)),
     httr::add_headers('Authorization'=token_config,

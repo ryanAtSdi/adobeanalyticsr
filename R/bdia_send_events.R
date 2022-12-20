@@ -28,7 +28,7 @@ bdia_send_events <- function(file, routing='g') {
                      TRUE ~ 'https://analytics-collection.adobe.io') #Global
 
   #get validation response
-  valid <- bdia_validate(file, routing)
+  valid <- adobeanalyticsr::bdia_validate_file(file, routing)
 
   #post, but only if file was validated
   #Ask Ben about best practice for getting API key...

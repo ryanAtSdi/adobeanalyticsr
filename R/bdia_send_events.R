@@ -17,7 +17,7 @@
 #' @family bdia
 #' @import dplyr httr
 #' @export
-bdia_send_events <- function(file, routing='g') {
+bdia_send_events <- function(file, routing='g', vgid='vg0') {
   env_vars <- get_env_vars()
   token_config <- get_token_config(client_id = env_vars$client_id,
                                    client_secret = env_vars$client_secret)
@@ -39,7 +39,8 @@ bdia_send_events <- function(file, routing='g') {
       url = paste0(e_url, '/aa/collect/v1/events'),
       body = list(file = httr::upload_file(file)),
       token_config,
-      httr::add_headers('x-api-key'=Sys.getenv("AW_API_KEY"))
+      httr::add_headers('x-adobe-vgid'=vgid,
+                        'x-api-key'=Sys.getenv("AW_API_KEY"))
     )
 
     #response

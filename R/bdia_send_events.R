@@ -12,6 +12,9 @@
 #' 'g' for Global routing (default),
 #' 'e' for Europe & Asia routing,
 #' 'n' for North America routing.
+#' @param vgid The Visitor Group ID you want to assign to the file. Defaults to vg0.
+#' Learn more about using Visitor Groups with the Bulk Data Insertion API here:
+#' https://developer.adobe.com/analytics-apis/docs/2.0/guides/endpoints/bulk-data-insertion/visitor-groups/
 #'
 #' @seealso [bdia_validate_file()]
 #' @family bdia

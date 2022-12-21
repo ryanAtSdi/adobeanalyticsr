@@ -1,0 +1,182 @@
+---
+title: "BDIA Testing"
+author: "Ryan DuPont"
+date: "2022-12-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# Install adobeanayticsr from github
+devtools::install()
+devtools::install_github('ryanAtSdi/adobeanalyticsr')
+
+# Load the package
+library(adobeanalyticsr)
+```
+
+# bdia_pageview_template() TESTING
+
+## bdia_pageview_template() is a function that writes a template to the global environment 
+## with the minimum required columns to aid users in using BDIA
+
+## 1 - Default
+## Expected output: 0x5 dataframe with cols: reportSuiteID, userAgent, timestamp, 
+## pageName, marketingCloudVisitorID
+```{r}
+bdia_pageview_template()
+pageview_template
+colnames(pageview_template)
+```
+
+## 2 - URL as page param
+## Expected output: 0x5 dataframe with cols: reportSuiteID, userAgent, timestamp,
+## pageURL, marketingCloudVisitorID
+```{r}
+bdia_pageview_template(pageParam = 'url')
+pageview_template
+colnames(pageview_template)
+```
+
+## 3 - Query string as page param
+## Expected output: 0x5 dataframe with cols: reportSuiteID, userAgent, timestamp,
+## queryString, marketingCloudVisitorID
+```{r}
+bdia_pageview_template(pageParam = 'qstring')
+pageview_template
+colnames(pageview_template)
+```
+
+## 4 - Visitor ID as unique identifier
+## Expected output: 0x5 dataframe with cols: reportSuiteID, userAgent, timestamp,
+## pageName, visitorID
+```{r}
+bdia_pageview_template(idParam = 'vid')
+pageview_template
+colnames(pageview_template)
+```
+
+## 5 - IP Address as unique identifier
+## Expected output: 0x5 dataframe with cols: reportSuiteID, userAgent, timestamp,
+## pageName, IPAddress
+```{r}
+bdia_pageview_template(idParam = 'ip')
+pageview_template
+colnames(pageview_template)
+```
+
+## 6 - Custmer ID as unique identifier
+## Expected output: 0x6 dataframe with cols: reportSuiteID, userAgent, timestamp,
+## pageName, customerID.test.id, customerID.test.isMCSeed
+```{r}
+bdia_pageview_template(idParam = 'cid', cidType = 'test')
+pageview_template
+colnames(pageview_template)
+```
+
+## 7 - Custmer ID as unique identifier w/o cidType param
+## Expected output: Throw error "Input "cidType" is required when selecting Customer ID 
+## as your idParam."
+```{r}
+bdia_pageview_template(idParam = 'cid')
+pageview_template
+colnames(pageview_template)
+```
+
+# ####
+# bdia_df2gz() TESTING
+
+## bdia_df2gz() is a helper function that will write a df to a csv file then zip it in the
+## format required for BDIA
+
+## Expeced output: fakeData.csv.gz written to the working directory
+```{r}
+#create df
+bdia_pageview_template()
+fake_data <- c(
+  'ageo1xxpnwryantest',
+  'Not Available',
+  '2022-12-19T08:01:30-05:00',
+  'BDIATest',
+  '99999999999999999999999999999999999999'
+)
+pageview_template[1,] <- fake_data
+
+#run function
+bdia_df2gz(pageview_template, 'fakeData')
+```
+
+# ####
+# bdia_validate_file() TESTING
+
+## bdia_validate_file() sends a zipped data file to the BDIA validation endpoint. This will 
+## let the user know if any required columns are missing.
+
+## 1) Valid file sent
+## Expected output: "{\"success\":\"file is valid\"}"
+```{r}
+#jwt auth
+adobeanalyticsr::aw_auth('jwt')
+
+#validate file
+bdia_validate_file('fakeData.csv.gz')
+```
+
+## 2) Invalid file sent
+## Expected output: "{\"error\":\"There must be one of QueryString, PageName, or PageUrl defined in the file header.\\nProcessing complete. No valid rows to submit.\\nNo valid rows were found in the file.\"}"
+```{r}
+#create new file, missing pageName
+library(dplyr)
+pv_invalid <- pageview_template %>%
+  select(-pageName)
+
+bdia_df2gz(pv_invalid, 'invalidFile')
+
+#send invalid file to validation endpoint
+bdia_validate_file('invalidFile.csv.gz')
+```
+
+# ####
+# bdia_send_events() TESTING
+
+## bdia_send_events() sends a zipped data file to the BDIA events endpoint, which will send
+## the data to your report suite. As a backstop, the function will hit the validation endpoint
+## first, and only attempt to send to the events endpoint IF the file is validated. 
+
+## 1) Valid file sent, default visitor group
+## Expected output: 
+## "{\"success\":\"file is valid\"}"
+## "{\"file_id\":\"e2bb5e0c-e8f9-490f-a264-31ee9c75a0d6\",\"visitor_group_id\":\"vg0\",\"size\":
+## 159,\"received_date\":1671594121,\"rows\":1,\"invalid_rows\":0,\"upload_name\":
+## \"fakeData.csv.gz\",\"status\":\"File received, awaiting processing\",
+## \"status_code\":\"UPLOADED\",\"processing_log\":\"Processing complete: 1 rows 
+## will be submitted.  No invalid rows.
+## \\n\",\"idempotency_key\":\"e2bb5e0c-e8f9-490f-a264-31ee9c75a0d6\"}"
+
+## Note: Your output will have different IDs and received date values. 
+```{r}
+bdia_send_events('fakeData.csv.gz')
+```
+
+## 1) Valid file sent, visitor group set to 'testGroup'
+## Expected output: 
+## "{\"success\":\"file is valid\"}"
+## "{\"file_id\":\"e2bb5e0c-e8f9-490f-a264-31ee9c75a0d6\",\"visitor_group_id\":\"testGroup\",
+##\"size\": 159,\"received_date\":1671594121,\"rows\":1,\"invalid_rows\":0,\"upload_name\":
+## \"fakeData.csv.gz\",\"status\":\"File received, awaiting processing\",
+## \"status_code\":\"UPLOADED\",\"processing_log\":\"Processing complete: 1 rows 
+## will be submitted.  No invalid rows.
+## \\n\",\"idempotency_key\":\"e2bb5e0c-e8f9-490f-a264-31ee9c75a0d6\"}"
+
+## Note: Your output will have different IDs and received date values. 
+```{r}
+bdia_send_events('fakeData.csv.gz', vgid = 'testGroup')
+```
+
+## 3) Invalid file sent
+## Expected output: "{\"error\":\"There must be one of QueryString, PageName, or PageUrl defined ## in the file header.\\nProcessing complete. No valid rows to submit.\\nNo valid rows were 
+## found in the file.\"}"
+## File could not be validated. No request made to the events endpoint.
+```{r}
+bdia_send_events('invalidFile.csv.gz')
+```
+
